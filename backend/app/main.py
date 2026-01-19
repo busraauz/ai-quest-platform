@@ -14,6 +14,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 def custom_openapi():
     if app.openapi_schema:
@@ -39,20 +47,6 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
-# Configure CORS for frontend communication
-allowed_origins = [
-    settings.FRONTEND_URL,
-    "http://localhost:3000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["*"],
-    expose_headers=["Set-Cookie"],
-)
 
 api_router = APIRouter(prefix="/api")
 
