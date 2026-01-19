@@ -2,6 +2,11 @@
 
 QuestAI Platform is a comprehensive solution for generating, refining, and managing educational questions using AI. It features a modern Next.js frontend and a robust FastAPI backend, integrated with Supabase for data & auth and OpenRouter for AI capabilities.
 
+You can reach:
+
+- The deployed application at: https://ai-quest-platform.vercel.app/
+- The backend API at: https://ai-quest-platform.onrender.com/docs
+
 ## Tech Stack
 
 - **Frontend**: Next.js (React, TypeScript, TailwindCSS, Shadcn UI)
@@ -26,29 +31,34 @@ QuestAI Platform is a comprehensive solution for generating, refining, and manag
 ### 1. Backend Setup
 
 1.  Navigate to the backend directory:
+
     ```bash
     cd backend
     ```
 
 2.  Create and activate a virtual environment:
+
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows: venv\Scripts\activate
     ```
 
 3.  Install dependencies:
+
     ```bash
     pip install -r requirements.txt
     ```
 
 4.  Configure environment variables:
     copy `.env.example` to `.env` and fill in your details:
+
     ```bash
     cp .env.example .env
     ```
-    *   `SUPABASE_URL`: Your Supabase Project URL
-    *   `SUPABASE_KEY`: Your Supabase Service Role Key
-    *   `OPENROUTER_KEY`: Your OpenRouter API Key
+
+    - `SUPABASE_URL`: Your Supabase Project URL
+    - `SUPABASE_KEY`: Your Supabase Service Role Key
+    - `OPENROUTER_KEY`: Your OpenRouter API Key
 
 5.  Run the server:
     ```bash
@@ -59,21 +69,25 @@ QuestAI Platform is a comprehensive solution for generating, refining, and manag
 ### 2. Frontend Setup
 
 1.  Navigate to the frontend directory:
+
     ```bash
     cd frontend
     ```
 
 2.  Install dependencies:
+
     ```bash
     npm install
     ```
 
 3.  Configure environment variables:
     Create a `.env.local` file with the following content:
+
     ```env
     NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
     ```
-    *   This URL is used by the Next.js server-side proxy to forward requests to your running backend.
+
+    - This URL is used by the Next.js server-side proxy to forward requests to your running backend.
 
 4.  Run the development server:
     ```bash
@@ -86,55 +100,54 @@ QuestAI Platform is a comprehensive solution for generating, refining, and manag
 ### Key Components
 
 1.  **Frontend (Next.js)**:
-    *   Added auth mechanism using cookies.
-    *   Added proxy to forward requests to the backend.
-    *   Added pages:
-        - Auth pages (login, register)
-        - Dashboard pages (dashboard, pdf-workspace, similar-questions, interactive-studio, questions, settings)
-    *   Added API routes to handle authentication and authorization.
-        - /api/auth/login
-        - /api/auth/register
-        - /api/auth/logout 
-        - /api/backend/[...path]
- 
+    - Added auth mechanism using cookies.
+    - Added proxy to forward requests to the backend.
+    - Added pages:
+      - Auth pages (login, register)
+      - Dashboard pages (dashboard, pdf-workspace, similar-questions, interactive-studio, questions, settings)
+    - Added API routes to handle authentication and authorization.
+      - /api/auth/login
+      - /api/auth/register
+      - /api/auth/logout
+      - /api/backend/[...path]
+
 2.  **Backend (FastAPI)**:
-    *   Created /api folder to handle backend requests.
-    *   Added /core/config to handle environment variables.
-    *   Added /db folder to handle database connection, migrations and repositories.
-    *   Added /schemas folder to handle request and response schemas.
-    *   Added /services folder to handle business logic.
-    *   Added /utils folder to handle utility functions.
-    *   Added /ai folder to handle AI requests through agents.
-    *   Added /orchestration folder to handle orchestration of business logic and agents.
-    
+    - Created /api folder to handle backend requests.
+    - Added /core/config to handle environment variables.
+    - Added /db folder to handle database connection, migrations and repositories.
+    - Added /schemas folder to handle request and response schemas.
+    - Added /services folder to handle business logic.
+    - Added /utils folder to handle utility functions.
+    - Added /ai folder to handle AI requests through agents.
+    - Added /orchestration folder to handle orchestration of business logic and agents.
 
 3.  **Database (Supabase)**:
-    *   Used Supabase for database, auth and storage.
-    *   Added /db folder to handle database connection, migrations and repositories.
-    *   Storages:
-        - For documents
-        - For similar questions images
-    *  Tables:
-        - sessions: Stores user sessions for every AI generation of document based and similarity based questions.
-        - documents: Stores documents uploaded by user for document based questions.
-        - doc_chunks: Stores document chunks for document based questions with pgvector embeddings.
-        - question_seeds: Stores seeds for similarity based questions.
-        - questions: Stores questions generated by AI.
-        - question_versions: Stores versions of questions generated by AI for refinement of document based questions and similarity based questions.
-4. **Services**:
-    *   document: Handles document pdf upload, processing, embedding and storage.
-    *   similar: Handles image upload, processing, analysis and storage.
+    - Used Supabase for database, auth and storage.
+    - Added /db folder to handle database connection, migrations and repositories.
+    - Storages:
+      - For documents
+      - For similar questions images
+    - Tables:
+      - sessions: Stores user sessions for every AI generation of document based and similarity based questions.
+      - documents: Stores documents uploaded by user for document based questions.
+      - doc_chunks: Stores document chunks for document based questions with pgvector embeddings.
+      - question_seeds: Stores seeds for similarity based questions.
+      - questions: Stores questions generated by AI.
+      - question_versions: Stores versions of questions generated by AI for refinement of document based questions and similarity based questions.
+4.  **Services**:
+    - document: Handles document pdf upload, processing, embedding and storage.
+    - similar: Handles image upload, processing, analysis and storage.
 
-5. **AI**:
-    *   Provides access to LLMs for question generation.
-    *   Added /ai/prompts folder to handle prompts for AI requests.
-    *   Added /ai/agents folder to handle agents for AI requests.
+5.  **AI**:
+    - Provides access to LLMs for question generation.
+    - Added /ai/prompts folder to handle prompts for AI requests.
+    - Added /ai/agents folder to handle agents for AI requests.
 
-6. **Orchestration**:
-    *   Handles orchestration of business logic and agents.
-    *   Added /orchestration folder to handle orchestration of business logic and agents.
+6.  **Orchestration**:
+    - Handles orchestration of business logic and agents.
+    - Added /orchestration folder to handle orchestration of business logic and agents.
 
-7. **Logger**:
-    *   Centralized logging configuration (`app/core/logger.py`).
-    *   Uses `rich` for pretty console output in development.
-    *   Request Middleware (`app/middleware/logging.py`) tracks method, path, status, and duration for all API calls.
+7.  **Logger**:
+    - Centralized logging configuration (`app/core/logger.py`).
+    - Uses `rich` for pretty console output in development.
+    - Request Middleware (`app/middleware/logging.py`) tracks method, path, status, and duration for all API calls.
