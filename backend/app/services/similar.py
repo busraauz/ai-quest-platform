@@ -1,8 +1,6 @@
 import base64
-from turtle import st
 from typing import List
 from uuid import UUID
-from venv import create
 
 from fastapi import HTTPException, UploadFile
 
