@@ -1,0 +1,42 @@
+# Frontend (Node/Next)
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/build/
+frontend/coverage/
+frontend/.turbo/
+frontend/.cache/
+frontend/.env*
+
+
+# Backend (Python)
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.tox/
+backend/.coverage
+backend/htmlcov/
+backend/.venv/
+backend/venv/
+backend/env/
+backend/.env/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
