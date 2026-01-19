@@ -42,9 +42,7 @@ export const useAuthStore = create<AuthState>()(
       refreshUser: async () => {
         set({ loading: true });
         try {
-          const res = await fetch(`${config.apiBaseUrl}/api/auth/me`, {
-            credentials: "include",
-          });
+          const res = await fetch(`/api/auth/me`);
 
           if (res.ok) {
             const data = await res.json();
@@ -63,7 +61,6 @@ export const useAuthStore = create<AuthState>()(
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ email, password }),
         });
 
@@ -83,10 +80,9 @@ export const useAuthStore = create<AuthState>()(
         return data as Record<string, unknown>;
       },
       signup: async (email: string, password: string, displayName?: string) => {
-        const res = await fetch(`${config.apiBaseUrl}/api/auth/signup`, {
+        const res = await fetch(`/api/auth/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({
             email,
             password,
@@ -109,9 +105,8 @@ export const useAuthStore = create<AuthState>()(
       },
       logout: async () => {
         try {
-          await fetch(`${config.apiBaseUrl}/api/auth/logout`, {
+          await fetch(`/api/auth/logout`, {
             method: "POST",
-            credentials: "include",
           });
         } catch (error) {
           console.error("Logout error:", error);
