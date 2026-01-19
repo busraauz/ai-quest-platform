@@ -1,7 +1,5 @@
-from turtle import st
 from typing import List
 from uuid import UUID
-from venv import create
 
 from app.ai.embeddings import embed_query, embed_texts
 from app.db.repositories.chunks import (
