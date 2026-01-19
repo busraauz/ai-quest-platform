@@ -16,7 +16,7 @@ import {
   ZoomOut,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 
 type QuestionPayload = {
   question_type: "mcq" | "open" | "open_ended";
@@ -50,7 +50,7 @@ type QuestionVersionResponse = {
   content: QuestionPayload;
 };
 
-export default function InteractiveStudioPage() {
+function StudioContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const questionId = searchParams.get("questionId");
@@ -562,5 +562,13 @@ export default function InteractiveStudioPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function InteractiveStudioPage() {
+  return (
+    <Suspense fallback={<Loading fullScreen message="Loading Studio..." size="lg" />}>
+      <StudioContent />
+    </Suspense>
   );
 }
