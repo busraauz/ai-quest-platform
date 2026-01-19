@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Loading } from "@/components/Loading";
 import { GeneratedQuestion } from "@/types/document";
 import { Separator } from "@/components/ui/separator";
 
-export default function QuestionPage() {
+function QuestionContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sessionId = searchParams.get("session_id");
@@ -87,5 +87,13 @@ export default function QuestionPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function QuestionPage() {
+  return (
+    <Suspense fallback={<Loading fullScreen message="Loading questions..." size="lg" />}>
+      <QuestionContent />
+    </Suspense>
   );
 }
