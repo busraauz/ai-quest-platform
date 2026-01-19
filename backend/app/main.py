@@ -2,6 +2,11 @@ from fastapi import APIRouter, FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.core.logger import setup_logging
+from app.middleware.logging import RequestLoggingMiddleware
+
+# Initialize logging on startup
+setup_logging()
 from app.api.routes.document import router as documents_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.question import router as question_router
@@ -27,6 +32,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(RequestLoggingMiddleware)
 
 
 def custom_openapi():

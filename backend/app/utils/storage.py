@@ -9,13 +9,12 @@ def upload_pdf_bytes(
     content_type: str = "application/pdf",
 ) -> str:
     sb = get_supabase_storage_client()
-    response = sb.storage.from_(bucket).upload(
+    sb.storage.from_(bucket).upload(
         path=path,
         file=content,
         file_options={
             "content-type": content_type,
         },
     )
-    print(response)
 
     return f"{bucket}/{path}"

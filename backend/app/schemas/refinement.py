@@ -49,11 +49,7 @@ QUESTION_REFINEMENT_SCHEMA = {
             "properties": {
                 "question_type": {"type": "string", "enum": ["mcq", "open"]},
                 "question_text": {"type": "string", "minLength": 5},
-                # MCQ -> object with A/B/C/D
-                # Open -> null
                 "options": {"oneOf": [MCQ_OPTIONS_SCHEMA, {"type": "null"}]},
-                # MCQ -> "A"|"B"|"C"|"D"
-                # Open -> free text
                 "correct_answer": {"type": "string", "minLength": 1},
                 "explanation": {"type": "string", "minLength": 20},
                 "tags": {"type": ["object", "null"]},

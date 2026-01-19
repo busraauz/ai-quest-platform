@@ -9,11 +9,6 @@ def build_document_prompt(
     count: int,
     question_type: QuestionType,
 ) -> List[ChatCompletionMessageParam]:
-    """
-    Returns chat messages for document-based question generation.
-    Output MUST be strict JSON only (no markdown, no prose).
-    """
-
     system = f"""
 You are an educational content generator for teachers.
 
@@ -31,7 +26,6 @@ QUALITY RULES:
 - Explanations must justify why the answer is correct (and for MCQ, why distractors are wrong).
 """.strip()
 
-    # Keep context concise; you can join top-k retrieved chunks here
     study_text = "\n\n---\n\n".join(context_chunks)
 
     user = f"""
@@ -72,7 +66,7 @@ ADDITIONAL CONSTRAINTS:
 - If question_type is "open":
   - options MUST be null
   - correct_answer MUST be a short text answer (not a paragraph)
-- explanation MUST be detailed and step-by-step for BOTH types.
+- Explanation MUST be detailed and step-by-step for BOTH types.
 
 STUDY TEXT:
 {study_text}

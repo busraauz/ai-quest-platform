@@ -6,12 +6,6 @@ from app.db.repositories.question import (
     get_latest_question_version,
     get_question_by_id,
     insert_question_version,
-    insert_questions,
-)
-from app.schemas.document import (
-    DocumentGenerateRequest,
-    DocumentGenerateResponse,
-    GeneratedQuestion,
 )
 from app.schemas.refinement import QuestionContent, RefinementResponse
 
@@ -37,10 +31,8 @@ class RefinementOrchestration:
             "confidence_score": base.get("confidence_score"),
         }
 
-        # 2) Load latest version (latest_content)
         latest = get_latest_question_version(question_id)
 
-        # 3) Seed v1 if none exists (optional but recommended)
         if latest is None:
             insert_question_version(
                 question_id=question_id,
@@ -55,13 +47,11 @@ class RefinementOrchestration:
             current = latest["content"]
             next_version = int(latest["version"]) + 1
 
-        # ✅ 4) Call agent with latest_content (current)
         edited = self.agent.run(
             instruction=instruction,
             current_question=current,
         )
 
-        # 5) Persist as a NEW version row (don’t update questions)
         insert_question_version(
             question_id=question_id,
             user_id=user_id,

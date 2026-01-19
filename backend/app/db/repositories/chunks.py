@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, cast
 
 from supabase import Client
 
@@ -88,4 +88,4 @@ def match_doc_chunks(
     }
     res = sb.rpc("match_doc_chunks", payload).execute()
     # If no matches, data could be [] which is valid
-    return res.data or []
+    return cast(List[Dict[str, Any]], res.data or [])

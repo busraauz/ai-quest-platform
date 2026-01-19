@@ -27,10 +27,10 @@ def insert_questions(
                 "source_type": source_type,
                 "question_type": q["question_type"],
                 "question_text": q["question_text"],
-                "options": q.get("options"),  # jsonb
+                "options": q.get("options"),
                 "correct_answer": q["correct_answer"],
                 "explanation": q["explanation"],
-                "tags": q.get("tags"),  # jsonb nullable
+                "tags": q.get("tags"),
                 "confidence_score": q.get("confidence_score"),
             }
         )
@@ -114,7 +114,6 @@ def get_recent_questions(user_id: str) -> List[Dict[str, Any]]:
     for q in rows:
         groups[q["session_id"]].append(q)
 
-    # convert to list sorted by newest question time per session
     sessions = [
         {
             "session_id": sid,

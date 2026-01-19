@@ -27,11 +27,11 @@ def _set_auth_cookie(response: JSONResponse, token: str) -> None:
     response.set_cookie(
         key="access_token",
         value=token,
-        httponly=True,  # Prevent XSS attacks
-        secure=True,  # HTTPS only (set to False for local dev if needed)
-        samesite="lax",  # CSRF protection
-        max_age=3600,  # 1 hour expiration
-        path="/",  # Cookie available for all paths
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=3600,
+        path="/",
     )
 
 
@@ -40,13 +40,6 @@ async def signup(
     user: UserSignup,
     supabase: Client = Depends(get_supabase_client),
 ) -> JSONResponse:
-    """
-    Create a new user account
-
-    - **email**: Valid email address
-    - **password**: Minimum 8 characters
-    - **display_name**: Optional display name
-    """
     try:
         payload: SignUpWithEmailAndPasswordCredentials = {
             "email": user.email,
@@ -61,7 +54,6 @@ async def signup(
         res = supabase.auth.sign_up(payload)
         data = jsonable_encoder(_serialize_auth_response(res))
 
-        # Check if email confirmation is required
         if not data.get("session"):
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
@@ -71,7 +63,6 @@ async def signup(
                 },
             )
 
-        # Auto-login if email confirmation is disabled
         token = data.get("session", {}).get("access_token")
         response = JSONResponse(
             status_code=status.HTTP_201_CREATED,
@@ -104,12 +95,6 @@ async def login(
     user: UserLogin,
     supabase: Client = Depends(get_supabase_client),
 ) -> JSONResponse:
-    """
-    Authenticate user and create session
-
-    - **email**: User's email address
-    - **password**: User's password
-    """
     try:
         res = supabase.auth.sign_in_with_password(
             {
@@ -161,21 +146,15 @@ async def login(
 async def logout(
     supabase: Client = Depends(get_supabase_client),
 ) -> JSONResponse:
-    """
-    Sign out the current user and invalidate session
-    """
-    try:
-        # Use the correct signout method (not admin API)
-        supabase.auth.sign_out()
 
+    try:
+        supabase.auth.sign_out()
         response = JSONResponse(content={"message": "Logged out successfully"})
-        # Clear the auth cookie
         response.delete_cookie(key="access_token", path="/", samesite="lax")
 
         return response
 
     except Exception as e:
-        # Even if signout fails, clear the cookie
         response = JSONResponse(content={"message": "Logged out successfully"})
         response.delete_cookie(key="access_token", path="/", samesite="lax")
         return response
@@ -183,12 +162,8 @@ async def logout(
 
 @router.post("/refresh")
 async def refresh_token(
-    token: str = Depends(get_bearer_token),
     supabase: Client = Depends(get_supabase_client),
 ) -> JSONResponse:
-    """
-    Refresh the current session token
-    """
     try:
         res = supabase.auth.refresh_session()
         data = jsonable_encoder(_serialize_auth_response(res))
@@ -221,7 +196,4 @@ async def refresh_token(
 
 @router.get("/me")
 async def get_current_user_info(user=Depends(get_current_user)) -> Dict[str, Any]:
-    """
-    Get current authenticated user information
-    """
     return jsonable_encoder(user)

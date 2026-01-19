@@ -116,7 +116,7 @@ export default function SimilarQuestionsPage() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]"
+            className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr] items-center"
           >
             <div className="space-y-6">
               <Card className="border-gray-200 bg-white shadow-sm overflow-hidden">
@@ -124,9 +124,6 @@ export default function SimilarQuestionsPage() {
                   <CardTitle className="text-lg text-gray-900">
                     Source Input
                   </CardTitle>
-                  <CardDescription>
-                    Upload an image of the question and specify how to clone it.
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="relative group">

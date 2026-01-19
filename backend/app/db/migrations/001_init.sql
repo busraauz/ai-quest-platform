@@ -1,9 +1,15 @@
+-- ============================================================
+-- QuestAI Platform
+-- Includes: document flow + refinement + similarity seeds
+-- ============================================================
+
+-- Extensions
 create extension if not exists "pgcrypto";
 create extension if not exists vector;
 
--- -----------------------
+-- ============================================================
 -- sessions
--- -----------------------
+-- ============================================================
 create table if not exists public.sessions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null,
@@ -11,9 +17,14 @@ create table if not exists public.sessions (
 
   source_type text not null default 'document'
     check (source_type in ('document','similarity')),
+
   question_type text not null default 'mcq'
     check (question_type in ('mcq','open')),
+
   quantity int not null default 10,
+
+  difficulty text
+    check (difficulty is null or difficulty in ('easy','medium','hard')),
 
   created_at timestamptz not null default now()
 );
@@ -27,9 +38,9 @@ on public.sessions(created_at desc);
 create index if not exists sessions_source_type_idx
 on public.sessions(source_type);
 
--- -----------------------
--- documents
--- -----------------------
+-- ============================================================
+-- documents (PDF uploads for document-based generation)
+-- ============================================================
 create table if not exists public.documents (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null,
@@ -40,8 +51,10 @@ create table if not exists public.documents (
   mime_type text not null default 'application/pdf',
 
   extracted_text text,
+
   status text not null default 'ready'
     check (status in ('uploaded','processing','ready','failed')),
+
   error_message text,
 
   created_at timestamptz not null default now()
@@ -56,9 +69,9 @@ on public.documents(session_id);
 create index if not exists documents_created_at_idx
 on public.documents(created_at desc);
 
--- -----------------------
--- doc_chunks
--- -----------------------
+-- ============================================================
+-- doc_chunks (RAG chunks + pgvector embeddings)
+-- ============================================================
 create table if not exists public.doc_chunks (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null,
@@ -81,21 +94,21 @@ on public.doc_chunks(user_id);
 create index if not exists doc_chunks_document_id_idx
 on public.doc_chunks(document_id);
 
--- Better: partial index so NULL embeddings don't bloat ivfflat
+-- ivfflat index (partial to avoid NULL bloat)
 create index if not exists doc_chunks_embedding_ivfflat_idx
 on public.doc_chunks using ivfflat (embedding vector_cosine_ops)
 with (lists = 100)
 where embedding is not null;
 
--- -----------------------
--- questions
--- -----------------------
+-- ============================================================
+-- questions (stores generated questions for both flows)
+-- ============================================================
 create table if not exists public.questions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null,
   session_id uuid not null references public.sessions(id) on delete cascade,
 
-  -- nullable because similarity flow has no document
+  -- nullable because similarity flow has no PDF/document
   document_id uuid references public.documents(id) on delete set null,
 
   source_type text not null default 'document'
@@ -104,10 +117,9 @@ create table if not exists public.questions (
   question_type text not null
     check (question_type in ('mcq','open')),
 
-  correct_answer text not null default '',
   question_text text not null,
-
-  options jsonb,
+  options jsonb,                -- for mcq: {"A": "...", "B": "...", ...}
+  correct_answer text not null default '', -- mcq: "A"/"B"/"C"/"D"; open: short answer
   explanation text not null,
 
   tags jsonb,
@@ -134,9 +146,60 @@ on public.questions(source_type);
 create index if not exists questions_question_type_idx
 on public.questions(question_type);
 
--- -----------------------
+-- ============================================================
+-- question_versions (Canvas refinement history)
+-- ============================================================
+create table if not exists public.question_versions (
+  id uuid primary key default gen_random_uuid(),
+  question_id uuid not null references public.questions(id) on delete cascade,
+  user_id uuid not null,
+
+  version int not null,
+  instruction text not null,
+
+  content jsonb not null,
+
+  created_at timestamptz not null default now(),
+
+  unique(question_id, version)
+);
+
+create index if not exists idx_qv_question_id_version
+on public.question_versions(question_id, version desc);
+
+-- ============================================================
+-- question_seeds (Similarity input: text/image + analysis)
+-- ============================================================
+create table if not exists public.question_seeds (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  session_id uuid not null references public.sessions(id) on delete cascade,
+
+  input_mode text not null check (input_mode in ('text','image')),
+
+  seed_text text,
+  seed_image_path text,     -- Supabase Storage path
+  seed_image_mime text,
+  seed_image_size int,
+
+  extracted_text text,     
+  analysis jsonb,          
+
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_question_seeds_user_id
+on public.question_seeds(user_id);
+
+create index if not exists idx_question_seeds_session_id
+on public.question_seeds(session_id);
+
+create index if not exists idx_question_seeds_created_at
+on public.question_seeds(created_at desc);
+
+-- ============================================================
 -- RPC: vector search in doc_chunks
--- -----------------------
+-- ============================================================
 create or replace function public.match_doc_chunks(
   p_user_id uuid,
   p_document_id uuid,
@@ -164,16 +227,3 @@ as $$
   order by c.embedding <=> p_query_embedding
   limit p_match_count;
 $$;
-
-
-alter table public.sessions
-add column if not exists difficulty text;
-
-do $$
-begin
-  if not exists (select 1 from pg_constraint where conname = 'sessions_difficulty_check') then
-    alter table public.sessions
-      add constraint sessions_difficulty_check
-      check (difficulty is null or difficulty in ('easy','medium','hard'));
-  end if;
-end $$;

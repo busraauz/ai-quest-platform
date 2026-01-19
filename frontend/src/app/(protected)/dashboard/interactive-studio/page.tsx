@@ -284,7 +284,7 @@ function StudioContent() {
   return (
     <div className="flex h-screen bg-[#F9FAFB] overflow-hidden">
       {/* Sidebar: Question Info & Quick Actions */}
-      <div className="w-80 border-r bg-white flex flex-col hidden lg:flex">
+      <div className="w-60 border-r bg-white flex flex-col hidden lg:flex">
         <div className="p-6 border-b">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center">
@@ -295,51 +295,9 @@ function StudioContent() {
               <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">History & Controls</p>
             </div>
           </div>
-          <div className="space-y-1">
-            <div className="flex justify-between text-sm py-2 px-1">
-              <span className="text-gray-500">Document</span>
-              <span className="font-medium text-gray-900 truncate max-w-[120px]">{question.subject}</span>
-            </div>
-            <div className="flex justify-between text-sm py-2 px-1">
-              <span className="text-gray-500">Current Version</span>
-              <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-100">
-                {question.versionLabel}
-              </Badge>
-            </div>
-          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Send className="h-4 w-4 text-indigo-500" />
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-1 gap-2">
-              {[
-                { label: "Make it harder", icon: "🔥", prompt: "Make this question significantly harder and more challenging." },
-                { label: "Simplify wording", icon: "✨", prompt: "Simplify the wording of this question to make it clearer." },
-                { label: "Add an option", icon: "➕", prompt: "Add one more plausible incorrect option (E) to the MCQ." },
-                { label: "Fix grammar", icon: "✍️", prompt: "Check and fix any grammatical errors in the question and explanation." },
-                { label: "Add real-world case", icon: "🌍", prompt: "Re-contextualize this question within a real-world scenario." },
-              ].map((action) => (
-                <Button
-                  key={action.label}
-                  variant="outline"
-                  size="sm"
-                  className="justify-start h-9 text-left font-normal border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/50 group"
-                  onClick={() => {
-                    setInstruction(action.prompt);
-                    handleRefine(action.prompt);
-                  }}
-                >
-                  <span className="mr-2 group-hover:scale-110 transition-transform">{action.icon}</span>
-                  <span className="truncate">{action.label}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
-
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-3">Version History</h3>
             <div className="space-y-2">
@@ -408,74 +366,7 @@ function StudioContent() {
                   </Badge>
                   <div className="h-px flex-1 bg-gray-200" />
                 </div>
-                
-                {i === versions.length - 1 ? (
-                  <div className="bg-white rounded-xl border-2 border-indigo-100 shadow-xl p-8 space-y-8">
-                    <div className="space-y-4">
-                      <label className="text-xs font-bold text-indigo-600 uppercase tracking-widest">Question Text</label>
-                      <textarea
-                        className="w-full text-xl font-medium text-gray-900 border-none focus:ring-0 p-0 bg-transparent resize-none min-h-[100px]"
-                        value={v.question_text}
-                        readOnly // We'll make it editable once we have a Save API
-                        placeholder="Enter question text..."
-                      />
-                    </div>
-
-                    {v.options && (
-                      <div className="space-y-4">
-                        <label className="text-xs font-bold text-indigo-600 uppercase tracking-widest">Options</label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {Object.entries(v.options).map(([k, val]) => (
-                            <div
-                              key={k}
-                              className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
-                                k === v.correct_answer
-                                  ? "border-emerald-500 bg-emerald-50/50"
-                                  : "border-gray-100 bg-gray-50/30"
-                              }`}
-                            >
-                              <div className={`h-8 w-8 rounded-lg flex items-center justify-center font-bold text-sm ${
-                                k === v.correct_answer ? "bg-emerald-500 text-white" : "bg-white border text-gray-400"
-                              }`}>
-                                {k}
-                              </div>
-                              <input
-                                className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-medium"
-                                value={val}
-                                readOnly
-                              />
-                              {k === v.correct_answer && (
-                                <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 border-none">Correct</Badge>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="space-y-4">
-                      <label className="text-xs font-bold text-indigo-600 uppercase tracking-widest">Explanation</label>
-                      <div className="bg-indigo-50/30 rounded-xl p-6 border border-indigo-100/50">
-                        <textarea
-                          className="w-full text-gray-600 text-sm leading-relaxed border-none focus:ring-0 p-0 bg-transparent resize-none min-h-[80px]"
-                          value={v.explanation}
-                          readOnly
-                          placeholder="Explain why the answer is correct..."
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <div className="flex gap-2">
-                         <Badge variant="outline" className="bg-white">{v.subject}</Badge>
-                         <Badge variant="outline" className="bg-white">{v.topic}</Badge>
-                      </div>
-                      <p className="text-[10px] text-gray-400 italic">Manual editing is currently disabled. Use the AI chat to refine.</p>
-                    </div>
-                  </div>
-                ) : (
                   <QuestionCard q={v as any} index={i} closeInteractiveBtn={true} />
-                )}
               </div>
             ))}
             <div ref={canvasEndRef} />

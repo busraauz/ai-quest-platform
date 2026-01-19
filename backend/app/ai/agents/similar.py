@@ -28,7 +28,6 @@ class SimilarAgent:
 
             try:
                 data = parse_json_strict(raw)
-                print(data)
                 validate_or_raise(data, SIMILAR_DIRECT_SCHEMA)
                 return data["questions"]
             except Exception as e:

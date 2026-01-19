@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
     fetchQuestions();
   }, [user]);
-  console.log(questions);
+
   if (loading) {
     return (
       <div className="relative flex min-h-screen flex-col bg-white mx-auto justify-center items-center">
@@ -94,7 +94,7 @@ export default function DashboardPage() {
           </h2>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link href="/dashboard/pdf-workspace">
             <Card className="relative group cursor-pointer rounded-2xl rounded-md justify-center flex border-gray-200 shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:border-indigo-700">
               <CardHeader className="flex flex-col items-center gap-1 justify-center w-full text-center">
@@ -103,7 +103,7 @@ export default function DashboardPage() {
                   PDF Workspace
                 </CardTitle>
                 <CardDescription className="mt-1 text-xs text-gray-600">
-                  Import PDFs or DOCX to analyze core concepts and generate
+                  Import PDFs to analyze core concepts and generate
                   structured question sets.
                 </CardDescription>
               </CardHeader>
@@ -117,24 +117,12 @@ export default function DashboardPage() {
                   Similar Questions
                 </CardTitle>
                 <CardDescription className="mt-1 text-xs text-gray-600">
-                  Paste existing text or scan images to create isomorphic
-                  variations of established items.
+                  Paste existing text or scan images to create variations
+                  of established items.
                 </CardDescription>
               </CardHeader>
             </Card>
           </Link>
-          <Card className=" relative group cursor-pointer rounded-2xl  rounded-md justify-center flex border-gray-200 shadow-sm transition hover:border-indigo-700 hover:-translate-y-1 hover:shadow-lg">
-            <CardHeader className="flex flex-col items-center gap-1 justify-center w-full text-center">
-              <Sparkles className="h-8 w-8 text-gray-400 group-hover:text-indigo-700" />
-              <CardTitle className="text-base text-gray-900 mt-2 uppercase">
-                Interactive Studio
-              </CardTitle>
-              <CardDescription className="mt-1 text-xs text-gray-600">
-                Real-time collaborative generation using natural language
-                prompts and AI refinement.
-              </CardDescription>
-            </CardHeader>
-          </Card>
         </div>
 
         <div className="mt-10 bg-white rounded-lg shadow p-6">
