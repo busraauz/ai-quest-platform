@@ -151,3 +151,92 @@ You can reach:
     - Centralized logging configuration (`app/core/logger.py`).
     - Uses `rich` for pretty console output in development.
     - Request Middleware (`app/middleware/logging.py`) tracks method, path, status, and duration for all API calls.
+
+
+## 🚀 Deployment
+
+### Backend (Render)
+
+1.  Go to [Render](https://render.com/) and sign up/log in.
+2.  Click "New" -> "Web Service".
+3.  Connect your GitHub repository.
+4.  Configure the settings:
+    - **Build Command**: `pip install -r requirements.txt`
+    - **Start Command**: `uvicorn app.main:app --host [IP_ADDRESS] --port $PORT`
+    - **Environment**: Python
+    - **Region**: Choose your preferred region.
+5.  Add the required environment variables (SUPABASE_URL, SUPABASE_KEY, OPENROUTER_KEY).
+6.  Click "Create Web Service".
+
+### Frontend (Vercel)
+
+1.  Go to [Vercel](https://vercel.com/) and sign up/log in.
+2.  Click "Add New..." -> "Project".
+3.  Import your frontend repository.
+4.  Configure the settings:
+    - **Framework**: Next.js
+    - **Build Command**: `npm run build`
+    - **Output Directory**: `.next`
+    - **Install Command**: `npm install`
+    - **Root Directory**: `frontend`
+5.  Add the required environment variables:
+    - `NEXT_PUBLIC_API_BASE_URL`: Set this to your Render backend URL (e.g., `https://ai-quest-platform.onrender.com`).
+6.  Click "Deploy".
+
+
+
+## Planning strategy
+I started with planning the architecture of the application and came up with the following:
+- Auth
+- Document based questions
+  - Upload document
+  - Split document into chunks
+  - Embed document chunks
+  - Generate questions
+  - Refine questions
+- Similarity based questions
+  - Upload image
+  - Generate questions
+  - Refine questions
+
+My plan was:
+
+**Backend first**
+- Design the structure of the backend.
+    - Added integrations of Supabase Auth, Database and Storage.
+    - Created database schema for documents, question seeds, questions and sessions.
+    - First I just implemented the authentication api routes and tested them with postman.
+    - Then I implemented the document based generation end-to-end.
+        - upload → extract PDF → chunk → embed → retrieve context → LLM structured generation → save questions
+    - Next added refinement for document based questions end-to-end.
+    - Then implemented the similarity based generation end-to-end.
+        - upload → extract image → analyze → LLM structured generation → save questions
+
+**Frontend second**
+- First I just make some design by using Google Stitch.
+- Design the structure of the frontend (pages, components, api routes, etc.).
+- Implemented the authentication.
+- Implemented the document based questions.
+- Implemented the similarity based questions.
+
+
+
+## AI tools I used:
+- Google Gemini 3 Pro for code review and debugging (Antigravity).
+- Google Stitch for UI design.
+- ChatGPT Codex for database design and prompts.
+
+
+## Where AI tools failed and how I manually intervened
+- JSON schema mismatch:
+
+    Model returned question instead of question_text, so strict schema validation failed and retried.
+
+- Next.js build error on Vercel (useSearchParams requires Suspense):
+
+    useSearchParams requires Suspense, so I wrapped the component with Suspense.
+
+- Render deployment port scan timeout:
+
+    Render detected no open port (app wasn’t binding correctly). I updated start command to bind to:
+    0.0.0.0:$PORT (Render-required)
